@@ -151,16 +151,17 @@ pnorm(3, 1.5, 2) - pnorm(2, 1.5, 2)
 # H(0) + H(2)
 pnorm(1, 1.5, 2) - pnorm(0, 1.5, 2) + pnorm(3, 1.5, 2) - pnorm(2, 1.5, 2)
 
-x <- seq(-3,3,by=0.001)
+x <- seq(-3,6,by=0.001)
 norm <- data.frame(x=x, dnorm = dnorm(x, 1.5, 2))
 
+library(ggplot2)
 library(dplyr)
-filter(data2, x >= 0 & x <= 1) 
+filter(norm, x >= 0 & x <= 1) 
 
-ggplot(data2, aes(x, y)) + 
+ggplot(norm, aes(x, dnorm)) + 
   geom_line(lwd=1.2) + 
-  geom_area(data=data2[x >= 0 & x <= 1,], fill = 'hotpink', alpha = 0.3) +   # H(0)
-  geom_area(data=data2[x >= 2 & x <= 3,], fill = 'turquoise', alpha = 0.3) + # H(2)
+  geom_area(data=norm[x >= 0 & x <= 1,], fill = 'hotpink', alpha = 0.3) +   # H(0)
+  geom_area(data=norm[x >= 2 & x <= 3,], fill = 'turquoise', alpha = 0.3) + # H(2)
   theme_bw(base_family = "jalnan", base_size = 20) +
   theme(axis.title = element_blank(),
         plot.title = element_text(hjust=0.5)) +

@@ -159,25 +159,19 @@ pnorm(3, 1.5, 2) - pnorm(2, 1.5, 2)
 # H(0) + H(2)
 pnorm(1, 1.5, 2) - pnorm(0, 1.5, 2) + pnorm(3, 1.5, 2) - pnorm(2, 1.5, 2)
 
-x <- seq(-3,3,by=0.001)
+x <- seq(-3,6,by=0.001)
 norm <- data.frame(x=x, dnorm = dnorm(x, 1.5, 2))
 
-library(tidyverse)
-x <- seq(-3,6,by=0.01)
-data <- tibble(x = x, y = dnorm(x, mean = 1.5, sd = 2)) %>% 
-  mutate(variable = case_when( # 범주형 변수 
-    (x >= 0 & x <= 1) ~ "area_1",
-    (x >= 2 & x <= 3) ~ "area_2",
-    TRUE ~ NA_character_)) # 그외 것들은 NA처리 
+filter(norm, x >= 0 & x <= 1) 
 
-ggplot(data, aes(x, y)) + 
-  geom_line() + 
-  geom_area(data = filter(data, variable == 'area_1'), fill = 'hotpink', alpha = 0.3) +   # H(0)
-  geom_area(data = filter(data, variable == 'area_2'), fill = 'turquoise', alpha = 0.3) + # H(2)
-   theme_bw(base_family = "jalnan", base_size = 20) +
-   theme(axis.title = element_blank(),
-         plot.title = element_text(hjust=0.5)) +
-   labs(title = "정규분포 문제 4 : H(O)와 H(2)의 면적") +
-   scale_x_continuous(breaks = seq(-3,6,by=1)) # axis.text.x 변경 
+ggplot(norm, aes(x, dnorm)) + 
+  geom_line(lwd=1.2) + 
+  geom_area(data=norm[x >= 0 & x <= 1,], fill = 'hotpink', alpha = 0.3) +   # H(0)
+  geom_area(data=norm[x >= 2 & x <= 3,], fill = 'turquoise', alpha = 0.3) + # H(2)
+  theme_bw(base_family = "jalnan", base_size = 20) +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(hjust=0.5)) +
+  labs(title = "정규분포 문제 4 : H(O)와 H(2)의 면적") +
+  scale_x_continuous(breaks = seq(-3,6,by=1)) # axis.text.x 변경 
 ```
 
