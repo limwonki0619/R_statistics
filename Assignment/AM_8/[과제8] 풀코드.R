@@ -27,6 +27,7 @@ library(reshape)
 
 dbinom(x=7, size=10, prob = 0.8)
 
+plot(x=0:10,y=dbinom(x=0:10,size=10, prob=0.8), type="h")
 
 # 3. A라는 회사는 스마트폰의 한 부품을 만드는 회사로, 이 A사의 불량률은 5%로 알려져 있다.
 #    이 회사의 제품 20개를 조사했을 때, 불량이 2개 이하로 나올 확률을 구하시오.
@@ -38,6 +39,11 @@ dbinom(x=7, size=10, prob = 0.8)
 pbinom(2, size=20, prob = 0.05)
 dbinom(0, 20, 0.05) + dbinom(1, 20, 0.05) + dbinom(2, 20, 0.05)
 
+ex_2 <- data.frame(x = 0:20,
+                   y = dbinom(x=0:20, size=20, prob=0.05))
+ggplot(ex_2) +
+  geom_bar()
+
 # 4. 어떤 희귀 바이러스에 감염되었을 때, 회복할 수 있는 치료율은 20%라고 한다. 
 # 이 바이러스에 감염된 환자 20명을 치료했을 때, 적어도 2명 이상은 회복될 확률을 구하시오.
 
@@ -46,6 +52,8 @@ dbinom(0, 20, 0.05) + dbinom(1, 20, 0.05) + dbinom(2, 20, 0.05)
 # 적어도 2명 이상 = 1 - 2명 미만
 
 1 - pbinom(1, size=20, prob=0.2)
+
+plot(x=0:20, dbinom(x=0:20, size=20, prob = 0.25), type="h")
 
 # 5. 주사위 두 개를 던졌을 때, 눈금의 합이 6이 될 확률을 구하시오.
 # [1,5] 
@@ -85,24 +93,24 @@ ggplot(data, aes(x, y)) +
 
 #    1) 20년 이상 근무한 종업원의 비율을 구하시오.   
 #       X ~ N(11,4^2) P(X>=20) = 1 - P(X<=19)
-1-pnorm(19, mean=11, sd=4) # 2%
+1-pnorm(20, mean=11, sd=4) # 2%
 
-(11-19)/4 # Z-점수
+(20-11)/4 # Z-점수
 
 x <- seq(-3,3,by=0.01)
 data <- tibble(x = x, y = dnorm(x, mean = 0, sd = 1)) %>% 
   mutate(variable = case_when( # 범주형 변수 
-    (x <= -1.25) ~ "area_1",
+    (x >= 2.25) ~ "area_1",
     TRUE ~ NA_character_)) # 그외 것들은 NA처리 
 
 ggplot(data, aes(x, y)) + 
   geom_line() + 
   geom_area(data = filter(data, variable == 'area_1'), fill = 'olivedrab3', alpha = 0.3) +  
-    theme_bw(base_family = "jalnan", base_size = 20) +
-    theme(axis.title = element_blank(),
+  theme_bw(base_family = "jalnan", base_size = 20) +
+  theme(axis.title = element_blank(),
         plot.title = element_text(hjust=0.5)) +
-    labs(title = "정규분포 문제 2-1 : P(Z <= -2) 면적") +
-    scale_x_continuous(breaks = seq(-3,3,by=1)) # axis.text.x 변경 
+  labs(title = "정규분포 문제 2-1 : P(Z >= 2.25) 면적") +
+  scale_x_continuous(breaks = seq(-3,3,by=1)) # axis.text.x 변경
 
 #    2) 근무연수가 가장 오래된 10%의 종업원은 이 회사에서 몇 년 이상 근무했다고 볼 수 있는가?
 qnorm(0.9, mean = 11, sd=4) # 16년 이상 
@@ -143,7 +151,6 @@ ggplot(data, aes(x, y)) +
 # X ~ B(1.5, 2^2)
 # H(0) = P(0 <= X <= 1)
 pnorm(1, 1.5, 2) - pnorm(0, 1.5, 2)
-
 
 # H(2) = P(2 <= X <= 3)
 pnorm(3, 1.5, 2) - pnorm(2, 1.5, 2)
