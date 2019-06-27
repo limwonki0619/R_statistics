@@ -29,11 +29,12 @@ chisq.test(x, p=c(9,3,3,1)/16)
 axis_x <- seq(0,15,by=0.01)
 data <- data.frame(x=axis_x,
                    y=dchisq(axis_x, df=3))
-1-pchisq(2.14, df=3)
-1-pchisq(7.81, df=3)
-1-pchisq(0.470024, df=3)
-qchisq(1-0.05, df=3)
-qchisq(1-0.9254, df=3)
+# 1-pchisq(7.81, df=3)
+# 1-pchisq(0.470024, df=3)
+# qchisq(1-0.05, df=3)
+# qchisq(1-0.9254, df=3)
+
+
 library(ggplot2)
 ggplot(data, aes(x=x,y=y)) + 
   geom_line() +
