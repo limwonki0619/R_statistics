@@ -36,8 +36,6 @@ str(UCBAdmissions)
 ucba.tab <- apply(UCBAdmissions, c(1,2), sum)
 chisq.test(ucba.tab, correct = F) # 예이츠 보정의 목적은 통계적 유의성을 과대 평가하는 것을 막기 위한 것으로 (특히 표본수가 작은 경우) 기본이 보정을 하는 것으로 되어 있습니다. 만약 하지 않으려면 correct=F의 옵션을 주면 됩니다. 
 
-
-
 data1 <- data.frame(x=seq(-3,3,0.01),
                     norm=dnorm(seq(-3,3,0.01)),
                     t=dt(seq(-3,3,0.01),3))
