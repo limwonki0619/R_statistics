@@ -1,0 +1,305 @@
+---
+title: '[과제11] 회귀분석'
+author: "Lim wonki"
+date: '2019 6 28 '
+output: html_document
+---
+
+ **[참고사이트1](https://rstudio-pubs-static.s3.amazonaws.com/190997_40fa09db8e344b19b14a687ea5de914b.html)** <br>
+ **[참고사이트2](https://kim-mj.tistory.com/59)**
+
+```{r, include=FALSE}
+library(extrafont)
+windowsFonts(dohyeon=windowsFont("BM DoHyeon"))
+windowsFonts(jalnan=windowsFont("Jalnan"))
+```
+
+### **문제 1.**
+#### 부모의 키가 클수록 자식의 키도 상대적으로 크다고 하는데, 아버지의 키와 아들의 키를 조사하였더니 아래와 같이 나왔다고 한다. 이 자료를 바탕으로 해서 회귀식을 구하고 아버지의 키가 165cm일 때 아들의 키는 얼마인지 예측하시오.
+
+```{r}
+ex1 <- data.frame(f = c(150, 160, 170, 180, 190),
+                  s = c(176, 179, 182, 181, 185))
+
+cor(ex1$s, ex1$f) # 아주 강한 상관관계가 있다. 
+
+# 0. 기본 가정 성립 여부 확인 
+# (1) 독립성  
+# (2) 선형성   : 1-chart
+# (3) 정규성   : 2-chart
+# (4) 등분산성 : 3-chart
+
+ex1_lm <- lm(s~f, data=ex1)
+par(mfrow=c(2,2))
+plot(lm(ex1_lm))
+par(mfrow=c(1,1))
+
+# 1. 가설설정 
+
+# H0 : 아들의 키는 아버지의 키와 선형관계가 없다.
+# H1 : 아들의 키는 아버지의 키와 선형관계가 있다.
+
+# 2. 회귀모형 검정 및 결론 
+
+# 아버지의 키가 아들의 키에 영향을 주는지 알아보기 위해 아들의 키를 종속변수, 아버지의 키를 독립변수로 설정하고 단순회귀분석을 실시했다. 
+summary(ex1_lm)
+
+# 회귀모형은 유의수준 5%에서 F 통계량 값이 23.08(p=0.017)로 통계적으로 유의하며
+# 회귀식에 대한 결정계수(R^2)는 0.885로 88.5%의 설명력을 보인다. 
+# 또한 독립변수인 아버지의 키(f)는 t 검정통계량 4.884(p=0.017)로 통계적으로 유의미한 영향을 주며
+# 아버지의 키 한 단위당 0.2(cm)의 양의 영향을 주는 것으로 나타났다. 
+# 그리고 y절편은 t 검정통계량 20.642(p=0.0.0002)로 통계적으로 유의하게 나타났다.
+# 따라서 회귀모형의 추정식은 '아들의 키(cm) = 146.6 + 0.2*아버지의 키(cm)'이고, 
+# 아버지의 키가 165cm 일 때 아들의 키는 179.6(cm)으로 예측할 수 있다. 
+
+library(ggplot2)
+ggplot(ex1, aes(x=f, y=s)) +
+  geom_point(size=2) +
+  geom_smooth(method = lm, color="orange") + # 회귀선 및 신뢰구간 
+    theme_bw(base_family = "dohyeon") +
+    labs(x = "아버지의 키(cm)", y="아들의 키(cm)", title = "아버지의 키와 아들의 키의 산점도 및 회귀선(95% 신뢰구간)") +
+    theme(plot.title = element_text(hjust = 0.5))
+
+```
+  
+  <br>
+  
+### **문제 2.**
+#### 소득이 높을수록 신용카드 사용량이 많아진다고 하는데, 월 소득 대비 신용카드 사용량을 조사하였더니 아래와 같이 나왔다고 한다. 이 자료를 바탕으로 해서 회귀식을 구하고, 월 소득이 250만원일 때 신용카드 사용량을 예측하시오. (단위: 만원)
+
+```{r}
+ex2 <- data.frame(소득 = c(100, 200, 300, 400, 500),
+                  카드사용량 = c(30, 70, 85, 140, 197))
+
+cor(ex2$소득, ex2$카드사용량) # 아주 강한 상관관계가 있다. 
+
+# 0. 기본 가정 성립 여부 확인 
+# (1) 독립성  
+# (2) 선형성   : 1-chart
+# (3) 정규성   : 2-chart
+# (4) 등분산성 : 3-chart
+
+ex2_lm <- lm(카드사용량~소득, data=ex2)
+par(mfrow=c(2,2))
+plot(lm(ex2_lm))
+par(mfrow=c(1,1))
+
+# 1. 가설설정 
+
+# H0 : 소득과 카드사용량은 선형관계가 없다.
+# H1 : 소득과 카드사용량은 선형관계가 있다.
+
+# 2. 회귀모형 검정 및 결론 
+
+# 소득이 카드사용량에 영향을 주는지 알아보기 위해 카드사용량을 종속변수, 소득을 독립변수로 설정하고 단순회귀분석을 실시했다. 
+summary(ex2_lm)
+
+# 회귀모형은 유의수준 5%에서 F 통계량 값이 79.54(p=0.00297)로 통계적으로 유의하며
+# 회귀식에 대한 결정계수(R^2)는 0.9637로 96.37%의 설명력을 보인다. 
+# 또한 독립변수인 소득은 t 검정통계량 8.919(p=0.00297)로 통계적으로 유의미한 영향을 주며
+# 소득의 1단위당 카드사용량에 0.404(만원)의 양의 영향을 주는 것으로 나타났다. 
+# 다만 y절편은 t 검정통계량 -1.118(p=0.34495)으로 통계적으로 유의하지 않아 회귀모형에서 제외되었다.
+# 따라서 회귀모형의 추정식은 '카드사용량(만원) = 0.404*소득(만원)'이고, 
+# 소득이 250(만원)일 때 카드사용량은 101(만원)으로 나타났다. 
+
+ggplot(ex2, aes(x=소득, y=카드사용량)) +
+  geom_point(size=2) +
+  geom_smooth(method = lm, color="deepskyblue") + # 회귀선 및 신뢰구간 
+    theme_bw(base_family = "dohyeon") +
+    labs(x = "소득(만원)", y="카드사용량(만원)", title = "소득과 카드사용량의 산점도 및 회귀선(95% 신뢰구간)") +
+    theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+  <br>
+  
+### **문제 3.**
+#### mtcars 데이터셋에서 배기량(disp)에 따른 마력(hp)의 회귀식을 구하시오.
+
+```{r}
+str(mtcars)
+library(dplyr)
+
+ex3 <- mtcars %>% select(disp, hp)
+cor(ex3$disp, ex3$hp) # 강한 양의 상관관계가 있다. 
+
+
+# 0. 기본 가정 성립 여부 확인 
+# (1) 독립성  
+# (2) 선형성   : 1-chart
+# (3) 정규성   : 2-chart
+# (4) 등분산성 : 3-chart
+
+ex3_lm <- lm(hp~disp, data=ex3)
+par(mfrow=c(2,2))
+plot(lm(ex3_lm))
+par(mfrow=c(1,1))
+shapiro.test(residuals(ex3_lm)) # 정규성을 만족하지 않음.. 
+
+# 1. 가설설정 
+
+# H0 : 배기량과 마력은 선형관계가 없다. 
+# H1 : 배기량과 마력은 선형관계가 있다.
+
+# 2. 회귀모형 검정 및 결론 
+
+# 배기량이 마력에 영향을 주는지 알아보기 위해 마력을 종속변수, 배기량을 독립변수로 설정하고 단순회귀분석을 실시했다. 
+summary(ex3_lm)
+
+# 회귀모형은 유의수준 5%에서 F 통계량 값이 50.13(p=7.143e-08)로 통계적으로 유의하며
+# 회귀식에 대한 결정계수(R^2)는 0.6256로 62.56%의 설명력을 보인다. 
+# 또한 독립변수인 배기량은 t 검정통계량 7.08(p=7.14e-08)로 통계적으로 유의미한 영향을 주며
+# 배기량의 1단위당 마력에 0.4375의 양의 영향을 주는 것으로 나타났다. 
+# 그리고 y절편은 t 검정통계량 2.836(p=0.00811)로 통계적으로 유의하다.
+# 따라서 회귀모형의 추정식은 '마력 = 45.7345 + 0.4375*배기량'이다.
+
+ggplot(ex3, aes(x=disp, y=hp)) +
+  geom_point(size=2) +
+  geom_smooth(method = lm, color="hotpink") + # 회귀선 및 신뢰구간 
+    theme_bw(base_family = "dohyeon") +
+    labs(x = "배기량", y="마력", title = "배기량과 마력의 산점도 및 회귀선(95% 신뢰구간)") +
+    theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+  <br>
+  
+### **문제 4.**
+#### MASS 패키지를 설치하고, 이 패키지 안에 있는 Boston 데이터셋을 이용하여 Boston 인근의 집값을 결정하는 다중회귀 모델을 만드시오.
+
+```{r}
+# 0. 변수설명 
+
+# CRIM    : 자치시(town) 별 1인당 범죄율  
+# ZN      : 25,000 평방피트를 초과하는 거주지역의 비율  
+# INDUS   : 비소매상업지역이 점유하고 있는 토지의 비율  
+# CHAS    : 찰스강에 대한 더미변수(강의 경계에 위치한 경우는 1, 아니면 0)  
+# NOX     : 10ppm 당 농축 일산화질소  
+# RM      : 주택 1가구당 평균 방의 개수
+# AGE     : 1940년 이전에 건축된 소유주택의 비율  
+# DIS     : 5개의 보스턴 직업센터까지의 접근성 지수  
+# RAD     : 방사형 도로까지의 접근성 지수  
+# TAX     : 10,000 달러 당 재산세율  
+# PTRATIO : 자치시(town)별 학생/교사 비율  
+# Black   : 1000(Bk-0.63)^2, 여기서 Bk는 자치시별 흑인의 비율을 말함. 
+# LSTAT   : 모집단의 하위계층의 비율(%)  
+# MEDV    : 본인 소유의 주택가격(중앙값) (단위: $1,000) == 집값
+
+library(MASS)
+data("Boston", package = "MASS")
+str(Boston)
+
+# 1. 독립변수 선택 
+
+# 선형 회귀 모델을 만들 때 주어진 여러 변수 중 어떤 변수를 설명 변수로 해야 할지는 모델링을 수행하는 사람의 배경 지식에 따라 결정할 수 있다. 
+# 하지만 이러한 배경 지식이 없거나, 배경 지식이 있어도 여전히 어떤 변수들을 선택해야 할지 정확히 결정할 수 없다면,
+# 변수의 통계적 특성을 고려해 기계적으로 설명 변수를 채택하는 방법을 사용할 수 있다. 
+
+# 독립변수를 선택하는 방법은 기본적으로 3 가지가 있다. 
+
+# 첫째,  전진 선택법(forward selection) : 절편만 있는 모델에서 기준 통계치를 가장 많이 개선시키는 변수를 차례로 추가하는 방법이다.
+# 둘째,  변수 소거법(backward elimination) : 모든 변수가 포함된 모델에서 기준 통계치에 가장 도움이 되지 않는 변수를 하나씩 제거하는 방법이다.
+# 셋째,  단계적 방법(stepwise selection) : 모든 변수가 포함된 모델에서 출발하여 기준 통계치에 가장 도움이 되지 않는 변수를 삭제하거나, 모델에서 빠져 있는 변수 중에서 기준 통계치를 가장 개선시키는 변수를 추가한다. 
+#        그리고 이러한 변수의 추가 또는 삭제를 반복한다. 반대로 절편만 포함된 모델에서 출발해 변수의 추가, 삭제를 반복할 수도 있다.
+
+
+
+
+# 모든 변수를 설명변수로 두고 최적의 모델을 찾아보자. (leaps, mlbench 패키지 필요)
+
+library(leaps)
+library(mlbench)
+all.model <- regsubsets(medv ~ ., data=Boston, nbest=4) # 전체모델
+summary(all.model)
+
+par(mfrow = c(1,2))
+plot(all.model, scale="adjr2", main = "adj R^2을 기준으로 결정한 최적모델") # adj R^2을 기준으로 결정한 최적모델 (클 수록 좋은 모델) 
+plot(all.model, scale="bic", main = " BIC 값을 기준으로 결정한 최적모델")   # BIC 값을 기준으로 결정한 최적모델  (작을수록 좋은 모델)
+par(mfrow=c(1,1))
+
+# 최적모델을 결정한 결과 집값에 영향을 주는 독립변수로는 절편, zn, chas, nox, rm, dis, ptratio, black, lstat으로 결정되었다. 
+
+selected_boston <- dplyr::select(Boston, zn, chas, nox, rm, dis, ptratio, black, lstat, medv)
+str(selected_boston)
+selected_boston$chas <- factor(selected_boston$chas)
+
+# 0. 오차항의 기본가정 검토 ----------------------------------------------------------------- 
+# 정규성, 등분산성, 선형성, 독립성 검정
+
+selected_model <- lm(medv ~ ., data=selected_boston)
+
+# 그래프로 보기
+par(mfrow=c(2,2))
+plot(selected_model)
+par(mfrow=c(1,1))
+
+# 오차에 대한 기본 가정을 검토해주는 패키지 (gvlma)
+library(car)
+library(gvlma)
+summary(gvlma::gvlma(selected_model)) # 검정결과 오차항의 기본 가정을 만족하지 못함.
+
+# gvlma::gvlma()     : 회귀모형
+# Global Stat        : 에러에 대한 전반적인 만족도
+# Skewness, Kurtosis : 정규성 검정
+# Link Function      : 선형성 검정
+# Heteroscedasticity : 등분산성 검정 
+
+# 1. 결정된 모델에서 다중공선성 문제 검토
+
+# - 독립변수들 간에 상관관계가 있는 것을 다중공선성이 있다고 한다
+# - 회귀분석의 가정 : 다중공선성이 없어야 한다
+# - VIF(Variance Inflation Factor : 분산팽창요인)
+# - VIF 값이 10이상이면, 다중공선성이 존재한다고 판단한다. 
+# 회귀 모델의 설명 변수들 사이에 상관관계가 있는 경우가 있는데, 이것을 “다중공선성” 라고 한다.
+# 다중공선성이 존재할 경우 모델의 정확도가 하락하게 되므로 어떤 두 변수 간에 다중 공선성이 존재할 경우 설명력이 더 적은 변수를 제거하고 모델을 재구성 한다.
+# R에서는 vif 함수를 사용해 VIF값을 간단히 구할 수 있으며, 보통 VIF 값이 4가 넘으면 다중공선성이 존재한다고 본다.
+
+car::vif(selected_model) # 다중공선성의 문제는 없다. 
+
+# 위 모델에서 오차항의 기본가정이 위배되어 결정계수가 두 번째로 높은 모델을 선택
+selected_boston2 <- dplyr::select(Boston, chas, nox, rm, dis, rad, ptratio, black, lstat,  medv)
+str(selected_boston2)
+
+selected_model2 <- lm(medv ~ ., data=selected_boston2)
+summary(selected_model2)
+
+summary(gvlma::gvlma(selected_model2))
+car::vif(selected_model2) # 다중공선성의 문제는 없다. 
+
+# 결정계수가 3번째인 모델에서 영향력이 가장 낮은 black 변수를 제외한 모델 선택
+selected_boston3 <- dplyr::select(Boston, crim, nox, rm, dis, rad, tax, ptratio, lstat, medv)
+
+selected_model3 <- lm(medv ~ ., data=selected_boston3)
+summary(selected_model3)
+
+summary(gvlma::gvlma(selected_model3)) # 그래도 기본가정에는 위배.. 
+car::vif(selected_model3) # 다중공선성의 문제는 없다. 
+
+# 2. 가설설정 
+
+# H0 : 회귀계수 = 0
+# H1 : not H0 
+
+# 3. (기본가정이 충족된다는 가정하에서... 첫번째 모델의) 회귀모델 검정 및 결론 
+summary(selected_model)
+
+# ZN      : 25,000 평방피트를 초과하는 거주지역의 비율  
+# CHAS    : 찰스강에 대한 더미변수(강의 경계에 위치한 경우는 1, 아니면 0)  
+# NOX     : 10ppm 당 농축 일산화질소  
+# RM      : 주택 1가구당 평균 방의 개수
+# DIS     : 5개의 보스턴 직업센터까지의 접근성 지수  
+# PTRATIO : 자치시(town)별 학생/교사 비율  
+# Black   : 1000(Bk-0.63)^2, 여기서 Bk는 자치시별 흑인의 비율을 말함. 
+# MEDV    : 본인 소유의 주택가격(중앙값) (단위: $1,000) == 집값
+
+# (기본가정 위배와 더미 변수 처리 등의 과정을 생략한)
+# 회귀모형은 유의수준 5%에서 F 통계량 값이 182.6(p=2.2e-16)로 통계적으로 매우 유의하며
+# 회귀식에 대한 결정계수(R^2)는 0.7196(수정된 결정계수 0.7156, 71.56%) 71.96%의 설명력을 보인다. 
+# 또한 독립변수들의 t 검정통계량은 각각 유의수준 0.0001에서 유의하고, nox만 유의수준 0.001에서 유의하다.
+# 따라서 최적 회귀모형의 추정식은 
+# medv = 30.4268 + 0.0367*zn + (-15.8367*nox) + 4.1830*rm + (-1.1411*dis) + (-0.9236*ptratio) + 0.01*black + (-0.5514*lstat) 로 나타났다.
+ 
+```
+
+  
+
