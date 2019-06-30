@@ -26,7 +26,7 @@ output: html_document
           - 독립표본 t-검정 or 대응표본 t-검정 <br><br>
           
       3. 정규성 검정을 한다. <br>
-          - t-test or 비모수 검정 <br><br>
+          - t-test or 비모수 검정(wilcox rank test) <br><br>
             
       4. 등분산 검정을 한다. <br>
           - 짝을 이룬 자료이거나 비모수 검정일 경우 필요 없는 단계이다. <br><br>
@@ -81,7 +81,6 @@ mean(am1$mpg); sd(am1$mpg) # am == 1 인 그룹의 mpg 평균과 표준편차
   <br><br>
   
 
-
 ### **문제 2**
 
 #### MASS 패키지에 내장된 Cars93 데이터프레임에 대해서 생산국(Origin)이 USA vs. non-USA 2개의 group 에 대해서 차 가격(Price)의 평균이 차이가 있는지를 검정해보시오.
@@ -97,10 +96,34 @@ n_USA <- dplyr::select(Cars93, Origin, Price) %>% filter(Origin == "non-USA")
 
 shapiro.test(USA$Price); qqnorm(USA$Price); qqline(USA$Price, col="red")       # p = 0.0002로 정규성을 만족하지 않음 -> 비모수검정 
 shapiro.test(n_USA$Price); qqnorm(n_USA$Price); qqline(n_USA$Price, col="red") # p = 0.0002로 정규성을 만족하지 않음
+```
 
-var.test(Cars93$Price ~ Cars93$Origin) # p = 0.01387로 등분산성도 만족하지 않음 
+### **비모수적 통계검정 (Wilcox rank test)**
+#### 두 집단 모두 정규성을 따르지 않으므로 소속집단에 상관없이 크기순으로 나열 후 순위를 합한 다음 통계량을 계산하여 검정하는 대표적인 비모수적 방법으로 검정해본다.
 
-# 1. 가설설정 # 실제로 정규성을 만족하지 않지만 .. 정규성을 만족한다는 가정 하에 분석을 진행함 
+```{r}
+# 1. 가설검정 
+
+# H0 : 지역(Origin)별 차 가격(Price)의 평균이 차이가 없다 
+# H1 : 지역(Origin)별 차 가격(Price)의 평균이 차이가 있다 (양측)
+
+wilcox.test(Cars93$Price ~ Cars93$Origin)
+
+# 검정결과, p-value가 0.6724로 유의수준 5%에서 귀무가설을 기각할 충분한 근거가 없다. 즉, 지역에 따른 차 가격의 평균은 차이가 없다고 판단된다. 
+```
+
+### **모수적 통계검정 (2-sample t-test)**
+#### 만약 두 집단의 가격이 모두 정규분포를 따른다고 가정한다면, 2-sample t-test를 사용한다. 
+
+```{r}
+# 먼저 등분산성을 검정하면
+
+# H0 : sigma1 == sigma2
+# H1 : sigma1 != sigma2
+
+var.test(Cars93$Price ~ Cars93$Origin) # p = 0.01387로 등분산성도 만족하지 않으므로 이분산을 가정한 t-test를 진행한다.
+
+# 1. 가설설정 
 
 # H0 : 지역(Origin)별 차 가격(Price)의 평균이 차이가 없다 
 # H1 : 지역(Origin)별 차 가격(Price)의 평균이 차이가 있다 (양측)
@@ -145,16 +168,38 @@ shapiro.test(mid$hwy); qqnorm(mid$hwy); qqline(mid$hwy, col="red")        # p = 
 
 mpg_sub_mid <- filter(mpg, class %in% c("subcompact","midsize"))          # class가 subcompact와 midsize인 데이터만 추출 
 
-var.test(mpg_sub_mid$hwy ~ mpg_sub_mid$class) # p = 0.0000 으로 등분산성 만족하지 않음 
+```
 
-# 1. 가설설정 # 실제로 정규성을 만족하지 않지만 .. 정규성을 만족한다는 가정 하에 분석을 진행함 
+#### **비모수적 통계검정 (Wilcoxon rank test)**
+##### 정규성 검정 결과 모두 p-value의 값이 유의수준 0.05보다 작아 정규성이 만족되지 않는다. 따라서 비모수검정방법 중 하나인 윌콕스 순위 검정을 시행한다. 
+  
+  
+```{r}
+# H0 : mu1 == mu2 
+# H1 : mu1 != mu2
+
+wilcox.test(mpg_sub_mid$hwy ~ mpg_sub_mid$class)
+
+# 윌콕스 검정 결과 유의확률이 0.9916으로 귀무가설을 기각할 충분한 근거가 없다. 즉 subcompact자동차와 midsize 자동차의 고속도로 연비는 차이가 없다. 
+```
+
+#### **모수적 통계검정 (2-sample T-test)**
+##### 만약 두 집단의 가격이 모두 정규분포를 따른다고 가정한다면, 모수적 방법인 2-sample T-test를 사용한다.
+
+```{r}
+# 0. 등분산성 검정 
+
+var.test(mpg_sub_mid$hwy ~ mpg_sub_mid$class) # p = 0.0000 으로 등분산성을 만족하지 않으므로, 이분산 t-test를 진행한다. 
+
+
+# 1. 가설설정 
 
 # H0 : 자동차 종류(subcompact, midsize)에 따른 고속도로 연비가 차이가 없다
 # H1 : 자동차 종류(subcompact, midsize)에 따른 고속도로 연비가 차이가 있다 (양측)
 
 # 2. 판정 
 
-t.test(mpg_sub_mid$hwy ~ mpg_sub_mid$class, mu=0, alternative = "two.sided", var.equal=F) # 등분산성을 만족하지 않음 
+t.test(mpg_sub_mid$hwy ~ mpg_sub_mid$class, mu=0, alternative = "two.sided", var.equal=F) # 등분산성을 만족하지 않아 이분산을 가정한 t-test를 진행 
 
 mean(subcm$hwy); sd(subcm$hwy)  # 차량종류가 subcompact인 차량의 고속도로 평균 연비와 표준편차 
 mean(mid$hwy); sd(mid$hwy)      # 차량종류가 mid인 차량의 고속도로 평균 연비와 표준편차
@@ -168,7 +213,6 @@ mean(mid$hwy); sd(mid$hwy)      # 차량종류가 mid인 차량의 고속도로 
 # 차량 종류에 따른 고속도로 평균 연비 차이가 통계적으로 유의하지 않다는 결론을 내릴 수 있다. 
 # 즉 차량 종류(subcompact, midsize)에 따른 고속도로 평균 연비(hwy)는 차이가 없다.
 ```
-
 
   <br><br>
   
@@ -187,6 +231,26 @@ shapiro.test(r$cty); qqnorm(r$cty); qqline(r$cty, col="red")  # p = 0.000027로 
 shapiro.test(p$cty); qqnorm(p$cty); qqline(p$cty, col="red")  # p = 0.04984로 정규성을 근소하게 만족하지 않음
 
 mpg_r_p <- filter(mpg, fl %in% c("r","p"))  # fl(연료종류)가 r(일반휘발유)과 p(고급휘발유)인 데이터만 추출 
+```
+
+#### **비모수적 통계검정 (Wilcoxon rank test)**
+##### 정규성 검정 결과 모두 p-value의 값이 유의수준 0.05보다 작아 정규성이 만족되지 않는다. 따라서 비모수검정방법 중 하나인 윌콕스 순위 검정을 시행한다. 
+
+```{r}
+# 1. 가설설정
+
+# H0 : mu1 == mu2
+# H1 : mu1 != mu2
+
+wilcox.test(mpg_r_p$cty ~ mpg_r_p$fl)
+
+# 검정결과 p-value값이 0.099로 유의수준 0.05보다 큰 값이다. 따라서 귀무가설을 기각할 만한 충분한 근거가 없다. 즉 연비에 따른 도시연비는 차이가 없다고 판단된다.
+```
+
+#### **모수적 통계검정 (2-sample T-test)**
+##### 만약 두 집단의 가격이 모두 정규분포를 따른다고 가정한다면, 모수적 방법인 2-sample T-test를 사용한다.
+
+```{r}
 var.test(mpg_r_p$cty ~ mpg_r_p$fl)          # p = 0.0428로 등분산성도 만족하지 않음 
 
 # 1. 가설설정 # 실제로 정규성을 만족하지 않지만 .. 정규성을 만족한다는 가정 하에 분석을 진행함 
@@ -240,7 +304,7 @@ var.test(subcompact$cty ~ subcompact$drv) # 등분산성 만족하지 않음 p =
 
 # 2. 판정 
 
-t.test(subcompact$cty ~ subcompact$drv, mu=0, alternative = "two.sided", var.equal=F) # 등분산성을 만족하지 않음 
+t.test(subcompact$cty ~ subcompact$drv, mu=0, alternative = "two.sided", var.equal=F) # 등분산성을 만족하지 않아 이분산 t-test 진행 
 
 mean(fowa$cty); sd(fowa$cty)  # subcompact 자동차의 구동방식이 전륜구동(f)인 자동차의 도시연비 평균과 표준편차
 mean(rear$cty); sd(rear$cty)  # subcompact 자동차의 구동방식이 후륜구동(r)인 자동차의 도시연비 평균과 표준편차 
@@ -266,17 +330,23 @@ mean(rear$cty); sd(rear$cty)  # subcompact 자동차의 구동방식이 후륜�
 # 새로운 당뇨병 치료제를 개발한 제약사에서는 치료에 지대한 영향을 주는 외부요인을 통제하기 위해 
 # 10명의 당뇨병 환자를 선별하여 1달 동안 '위약(placebo)'을 투여한 기간의 혈당 수치(Xi)와 '신약(new medicine)'을 투여한 1달 기간 동안의 
 # 혈당 수치(Yi)를 측정하여 짝을 이루어 혈당 차이를 유의수준 5%에서 비교하시오.
-# 정규성은 만족한다고 가정한다. 
+
 # D = mu1 - mu2
 
+# 0 정규성 검정 
+placebo <- c(51.4, 52, 45.5, 54.5, 52.3, 50.9, 52.7, 50.3, 53.8, 53.1)
+new <- c(50.1, 51.5, 45.9, 53.1, 51.8, 50.3, 52, 49.9, 52.5, 53)
+D <- placebo - new
+
+shapiro.test(D); qqnorm(D); qqline(D, col="red")
+# 검정결과, p-value의 값이 0.4467로 유의수준 0.05보다 크다. 따라서 혈당 수치의 차이는 정규분포를 따른다고 결론내리고, 이에 따라 paired sample T-test를 실시한다.
+```
+
+```{r}
 # 1. 가설설정
 
 # H0 : 당뇨병 치료제는 효과가 없다 (mu1-mu2=0) == D = 0
 # H1 : 당뇨병 치료제는 효과가 있다 (혈당수치가 낮아지는 게 효과가 있으므로 mu1-mu2>0, 우측검정) D > 0
-
-placebo <- c(51.4, 52, 45.5, 54.5, 52.3, 50.9, 52.7, 50.3, 53.8, 53.1)
-new <- c(50.1, 51.5, 45.9, 53.1, 51.8, 50.3, 52, 49.9, 52.5, 53)
-D <- placebo - new
 
 # 2. 판정 
 t.test(placebo, new, alternative = "greater", paired = T, conf.level = 0.95)
@@ -301,14 +371,22 @@ mean(D); sd(D)
 # 다른 한쪽은 B라는 원재료로 만든 신발을 신긴 후에, 일정 기간이 지난후에 신발을 수거하여 10명의 각 소년의 왼쪽 신발 밑창의 닳은 정도와 
 # 오른쪽 신발 밑창의 닳은 정도의 차이를 비교하여 두 종류 원재료의 재질이 다른지를 검정하시오. (유의수준 0.05)
 
+# 0. 정규성 검정 
+A <- c(13.2, 8.2, 10.9, 14.3, 10.7, 6.6, 9.5, 10.8, 8.8, 13.3)
+B <- c(14, 8.8, 11.2, 14.2, 11.8, 6.4, 9.8, 11.3, 9.3, 13.6)
+D <- A-B
+
+shapiro.test(D)
+# 검정결과, p-value의 값이 0.8009로 유의수준 0.05보다 크다. 따라서 신발 밑창의 닳은 정도의 차이는 정규분포를 따른다고 결론내리고, 이에 따라 paired sample T-test를 실시한다. 
+
+
+
 # 1. 가설설정 
 
 # H0 : 두 종류의 신발 밑창 원재료는 닳는 정도가 같다 (D=0)
 # H1 : 두 종류의 신발 밑창 원재료는 닳는 정도가 다르다 (D!=0)
 
-A <- c(13.2, 8.2, 10.9, 14.3, 10.7, 6.6, 9.5, 10.8, 8.8, 13.3)
-B <- c(14, 8.8, 11.2, 14.2, 11.8, 6.4, 9.8, 11.3, 9.3, 13.6)
-D <- A-B
+
 
 # 2. 판정
 
@@ -334,21 +412,43 @@ mean(D); sd(D) # D의 평균과 표준편차
 ```{r}
 #### 다음은 3개 호수의 산소량의 차이가 있는지 없는지 알아보기 위하여 각 호수에서 10곳을 선택하여 수심 1m의 물로부터 산소량(ppm)을 측정한 자료이다. 3개 호수의 산소량이 같다고 할 수 있는가?
 
-# 정규성 및 등분산성은 가정이 충족되었다고 가정
-
-# 1. 가설설정
-# H0 : 각 호수의 산소량이 같다.
-# H1 : 적어도 하나의 호수의 산소량이 다르다
+# 정규성 검정  
 library(reshape)
 library(dplyr)
 ppm <- data.frame(l1 = c(5,7,6,8,6,7,8,8,6,10),
                 l2 = c(6,8,9,11,13,12,10,8,9,10),
-                l3 = c(14,25,26,18,19,22,21,16,20,30)) %>% melt()
+                l3 = c(14,25,26,18,19,22,21,16,20,30))
+
+shapiro.test(ppm$l1); qqnorm(ppm$l1); qqline(ppm$l1, col="red")
+shapiro.test(ppm$l2); qqnorm(ppm$l2); qqline(ppm$l2, col="red")
+shapiro.test(ppm$l3); qqnorm(ppm$l3); qqline(ppm$l3, col="red")
+
+# 검정결과, 모든 호수에 대한 p-value가 유의수준 0.05보다 크게 나왔다. 따라서 각 호수에 대한 산소량은 모두 정규분포를 따른다고 결론내린다. 
+
+
+# 등분산성 검정 
+
+# 이제 각 호수 별 산소량에 대한 분산이 모두 동일한 지 검정한다. 이에 대해서는 Levene의 검정과 Bartlett의 검정이 있다. 모두 세집단 이상의 경우에 대해 등분산성을 검정 시 사용하는 검정법이고 해당 통계량이 특정한 분포에 근사한다는 성질을 이용한다
+
+ppm2 <- ppm %>% melt()
+
+# levene.test
+library(lawstat) # ANOVA 분석에서 등분산성 검정  
+levene.test(ppm2$value, ppm2$variable)
+# bartlett.test
+bartlett.test(value ~ variable, ppm2)
+
+# 검정결과, 두가지 검정 모두 p-value의 값이 유의수준 0.05보다 작게 나왔다. 따라서 귀무가설을 기각하게 되고, 호수 별 산소량에 대한 분산은 차이가 있다고 결론내린다. 하지만, 각각 호수 별 10개씩 동일한 개수의 표본을 추출하였으므로 이 경우에는 분산분석을 적용하는 데 문제가 없다. 
+
+
+# 1. 가설설정
+# H0 : 각 호수의 산소량이 같다.
+# H1 : 적어도 하나의 호수의 산소량이 다르다
 
 # 2. 판정
-anova(lm(value ~ variable, data=ppm))
+anova(lm(value ~ variable, data=ppm2))
 
-ppm %>% 
+ppm2 %>% 
   group_by(variable) %>% 
   summarise(mean = mean(value),
             sd = sd(value))
@@ -361,9 +461,30 @@ ppm %>%
 # 호수 3의 산소량의 평균과 표준편차는 21.1 ± 4.84(ppm)로 나타났습니다.
 # 또한 일원분산분석을 통해 각 호수의 산소량(ppm)을 검정한 결과, 검정통계량과 유의확률은 56.124(p=2.411e-10)로 유의수준 5% 에서 
 # 통계적으로 아주 유의한 차이를 보였습니다. 즉, 호수에 따른 산소량의 평균은 차이가 나는 것으로 나타났습니다.
-# 다만, 어느 집단과의 차이가 통계적으로 유의한지 사후검정이 필요합니다. 
+# 다만, 어느 집단과의 차이가 통계적으로 유의한지 사후검정이 필요하다.
 
 
+
+# 4. 사후검정 
+# 그렇다면, 과연 어느 집단에서 차이가 발생하는 지 다중비교를 통해서 확인해보자. 이에 해당하는 방법에는 Tukey의 HSD, Duncan, Scheffe 등 다양한 방법이 존재하고, 모두 특정한 통계량을 계산하여 그 통계량과 각 집단에 대한 표본평균 값의 차이를 비교하여 그룹을 나누게 된다. 다만, Tukey의 HSD 방법이 가장 유연하고, Scheffe의 방법이 가장 엄격하다고 알려져 있다. 
+```
+
+#### **Tukey HSD**
+```{r}
+out <- aov(lm(value ~ variable, data=ppm2)) # anova 모형 
+(ph <- TukeyHSD(out))
+plot(ph)
+# 위의 결과에서 맨 오른쪽의 p-value 값을 확인해보면 ‘호수2-호수1’ 을 제외하고는 모두 유의수준 0.05보다 굉장히 작은 값이다. 그러므로 호수3의 산소량이 호수1과 호수2와 비교했을 때 현저히 차이가 난다고 볼 수 있고, 호수1과 호수2의 경우는 차이가 그리 유의하지 않다고 말할 수 있다. 
+```
+
+#### **Duncan**
+
+```{r}
+library(agricolae)  # Duncan, Scheffe test
+(res1 <- duncan.test(out, "variable", alpha=0.05, group = T, console = T))
+(res2 <- scheffe.test(out,"variable", alpha=0.05, group = T, console = T))
+
+# 분석결과, Duncan, Schaffe 모두 호수1과 호수2의 산소량은 차이가 미비하고, 나머지 호수3의 산소량이 나머지 두 집단과 차이가 있다는 결론을 주고 있다. 결과적으로 3가지 다중비교 방법 모두 같은 결론을 제시하고 있다.
 ```
 
   <br><br>
@@ -374,21 +495,35 @@ ppm %>%
 ```{r}
 #### 다음은 3개 채소에 대한 도매시장 7곳의 가격이다.3개 채소의 가격이 같다고 할 수 있는가?
 
-# 정규성 및 등분산성은 가정이 충족되었다고 가정
+# 0. 정규성 및 등분산성 검정 
+price <- data.frame(v1 = c(15.5, 14.3, 16.3, 13.5, 15.7, 16.4, 14.7),
+                    v2 = c(14.7, 16.3, 15.5, 15.2, 16.3, 13.5, 15.4),
+                    v3 = c(15.5, 13.2, 16.5, 15.7, 15.3, 15.2, 14.8)) 
+
+shapiro.test(price$v1); qqnorm(price$v1); qqline(price$v1, col="red")
+shapiro.test(price$v2); qqnorm(price$v2); qqline(price$v2, col="red")
+shapiro.test(price$v3); qqnorm(price$v3); qqline(price$v3, col="red")
+
+# 검정결과, 모든 채소에 대한 p-value가 유의수준 0.05보다 크게 나왔다. 따라서 각 채소별 가격은 모두 정규분포를 따른다고 결론내린다. 이제 각 채소별 가격에 대한 분산이 모두 동일한 지 검정한다. 
+
+price2 <- price %>% melt() 
+levene.test(price2$value, price2$variable)
+bartlett.test(value ~ variable, price2) 
+
+# 검정결과, 두가지 검정 모두 p-value의 값이 유의수준 0.05보다 크게 나왔다. 따라서 귀무가설을 기각하지 못하게 되고, 호수 별 산소량에 대한 분산은 차이가 없다고 결론내린다. 따라서 분산분석을 적용하는 데 문제가 없다. 
+
 
 # 1. 가설설정 
 
 # H0 : 각 채소의 가격이 같다 (mu1=mu2=m3)
 # H1 : 적어도 하나의 채소가 가격이 다르다 (not H0)
 
-price <- data.frame(v1 = c(15.5, 14.3, 16.3, 13.5, 15.7, 16.4, 14.7),
-                    v2 = c(14.7, 16.3, 15.5, 15.2, 16.3, 13.5, 15.4),
-                    v3 = c(15.5, 13.2, 16.5, 15.7, 15.3, 15.2, 14.8)) %>% melt()
 
 # 2. 판정 
-anova(lm(value ~ variable, data=price))
 
-price %>% 
+anova(lm(value ~ variable, data=price2))
+
+price2 %>% 
   group_by(variable) %>% 
   summarise(mean = mean(value),
             sd = sd(value))
@@ -401,7 +536,7 @@ price %>%
 # 채소 3의 가격 평균과 표준편차는 15.2 ± 1.02로 나타났습니다.
 
 # 또한 일원분산분석을 통해 각 채소의 가격을 검정한 결과, 검정통계량과 유의확률은 0.0178(p=0.9824)로 유의수준 5% 에서 
-# 통계적으로 유의하지 않음을 보였씁니다. 즉, 각 채소의 가격은 차이가 없는것으로 판단됩니다.
+# 통계적으로 유의하지 않음을 보였씁니다. 즉, 각 채소의 가격은 차이가 없는것으로 판단된다.
 
 ```
 
@@ -410,7 +545,6 @@ price %>%
 
 # 적합도/독립성 검정 
 ***
-
 
 ### **문제 1. (적합도 검정)** 
 
@@ -477,8 +611,6 @@ chisq.test(smoke[1:3,1:3], correct = F)
 # 3. 결론 
 
 # 음주량과 흡연량 간에 연관이 있는지를 알아보기 위해 임의의 500명에 대해 흡연량, 음주량으로 분류하여 독립성 검정을 실시한 결과
-# 검정통계량과 유의확률이 12.827(p=0.01215)로 나타나 음주량과 흡연량 간에 연관이 있다는 통계적으로 유의한 결론을 얻었습니다.
-
-
+# 검정통계량과 유의확률이 12.827(p=0.01215)로 나타나 음주량과 흡연량 간에 연관이 있다는 통계적으로 유의한 결론을 얻었다.
 ```
 
