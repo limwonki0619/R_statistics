@@ -1407,13 +1407,14 @@ chisq.test(x, p=c(85,15)/100) # 실제 부적합품률 </code></pre>
 
 # 시료의 부적합품률이 15%를 따르는지 알아보기 위해 80개의 시료를 관찰한 결과 적합품은 64개 부적합품은 16개로 나타났습니다.
 # 이 때의 검정통계량과 유의확률은 1.5686(p = 0.2104)로 시료의 부적합품률이 15%를 따른다는 귀무가설을 기각할 수 없습니다. 
-# 즉, 시료는 부적합품률 15%를 따른다고 판단됩니다.
-
-
-### 문제 2. (독립성 검정)
-#### 다음은 음주량과 흡연량 데이터이다. 이 표로부터 음주량과 흡연량 사이에 연관이 있는지 확인하시오.
-
-smoke &lt;- data.frame(two_up = c(23,31,13, 67), # 데이터 생성 
+# 즉, 시료는 부적합품률 15%를 따른다고 판단됩니다.</code></pre>
+</div>
+</div>
+<div id="section-12" class="section level3">
+<h3>문제 2. (독립성 검정)</h3>
+<div id="section-13" class="section level4">
+<h4>다음은 음주량과 흡연량 데이터이다. 이 표로부터 음주량과 흡연량 사이에 연관이 있는지 확인하시오.</h4>
+<pre class="r"><code>smoke &lt;- data.frame(two_up = c(23,31,13, 67), # 데이터 생성 
                     one_down = c(21, 48, 23, 92),
                     no = c(63, 159, 119, 341),
                     r_total = c(107, 238, 155, 500))
@@ -1421,9 +1422,9 @@ row.names(smoke) &lt;- c(&quot;두병 이상&quot;,&quot;한병 이하&quot;,&qu
 <p><br><br></p>
 </div>
 </div>
-<div id="section-12" class="section level3">
+<div id="section-14" class="section level3">
 <h3><strong>문제 2. (독립성 검정)</strong></h3>
-<div id="section-13" class="section level4">
+<div id="section-15" class="section level4">
 <h4>다음은 음주량과 흡연량 데이터이다. 이 표로부터 음주량과 흡연량 사이에 연관이 있는지 확인하시오.</h4>
 <pre class="r"><code>smoke &lt;- data.frame(two_up = c(23,31,13, 67), # 데이터 생성 
                     one_down = c(21, 48, 23, 92),
