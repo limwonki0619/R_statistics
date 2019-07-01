@@ -487,15 +487,23 @@ qnorm(0.95) # qnorm(1-(alpha/2))</code></pre>
 <h4><strong>문제 1.</strong></h4>
 <div id="a---1000-----10-----.-980-1008-968-1032-1012-996-1021-1002-996-1017------" class="section level5">
 <h5>A회사의 건전지의 수명시간이 1000시간 일 때, 무작위로 뽑은 10개의 건전지에 대한 수명은 다음과 같다. 980, 1008, 968, 1032, 1012, 996, 1021, 1002, 996, 1017 샘플이 모집단과 같다고 할 수 있는가?</h5>
-<pre class="r"><code>ex1 &lt;- c(980, 1008, 968, 1032, 1012, 996, 1021, 1002, 996, 1017)
+<pre class="r"><code># 가설설정
 
-shapiro.test(ex1) # 정규성을 가정할 수 있다. </code></pre>
+# H0 : mu1 == 1000
+# H1 : mu1 != 1000
+
+ex1 &lt;- c(980, 1008, 968, 1032, 1012, 996, 1021, 1002, 996, 1017)
+
+shapiro.test(ex1) </code></pre>
 <pre><code>## 
 ##  Shapiro-Wilk normality test
 ## 
 ## data:  ex1
 ## W = 0.97571, p-value = 0.9382</code></pre>
-<pre class="r"><code>t.test(ex1, mu = 1000, alternative = &quot;two.sided&quot;)</code></pre>
+<pre class="r"><code># Shapiro-wilk 검정결과 p-value가 0.9382로 정규성을 가정할 수 있다. </code></pre>
+<pre class="r"><code># 모분산을 모르고 소표본인 경우이므로 t-test를 실시하면 다음과 같다. 
+
+t.test(ex1, mu = 1000, alternative = &quot;two.sided&quot;)</code></pre>
 <pre><code>## 
 ##  One Sample t-test
 ## 
@@ -516,7 +524,12 @@ shapiro.test(ex1) # 정규성을 가정할 수 있다. </code></pre>
 <h4><strong>문제 2.</strong></h4>
 <div id="section-8" class="section level5">
 <h5>어떤 반의 학생들의 수학 평균성적은 55점이었다. 0교시 수업을 시행하고 나서 학생들의 시험 성적은 다음과 같다. 58, 49, 39, 99, 32, 88, 62, 30, 55, 65, 44, 55, 57, 53, 88, 42, 39 0교시 수업을 시행한 후, 학생들의 성적은 올랐다고 할 수 있는가?</h5>
-<pre class="r"><code>ex2 &lt;- c(58, 49, 39, 99, 32, 88, 62, 30, 55, 65, 44, 55, 57, 53, 88, 42, 39)
+<pre class="r"><code># 가설설정 
+
+# H0 : mu1 &lt;= 55
+# H1 : mu1 &gt; 55
+
+ex2 &lt;- c(58, 49, 39, 99, 32, 88, 62, 30, 55, 65, 44, 55, 57, 53, 88, 42, 39)
 
 shapiro.test(ex2) # 정규성을 가정할 수 있다. </code></pre>
 <pre><code>## 
@@ -524,7 +537,9 @@ shapiro.test(ex2) # 정규성을 가정할 수 있다. </code></pre>
 ## 
 ## data:  ex2
 ## W = 0.91143, p-value = 0.1058</code></pre>
-<pre class="r"><code>t.test(ex2, mu=55, alternative = &quot;greater&quot;)</code></pre>
+<pre class="r"><code># Shapiro-wilk 검정결과 p-value가 0.1058로 정규성을 가정할 수 있다. </code></pre>
+<pre class="r"><code># 모분산을 모르고 소표본인 경우이므로 t-test를 실시하면 다음과 같다. 
+t.test(ex2, mu=55, alternative = &quot;greater&quot;)</code></pre>
 <pre><code>## 
 ##  One Sample t-test
 ## 
@@ -545,15 +560,22 @@ shapiro.test(ex2) # 정규성을 가정할 수 있다. </code></pre>
 <h4><strong>문제 3.</strong></h4>
 <div id="g-.-2008------.-15.50-11.21-12.67-8.87-12.15-9.88-2.06-14.50-0-4.97-------" class="section level5">
 <h5>2006년 조사에 의하면 한국인의 1인 1일 평균 알코올 섭취량이 8.1g 이다. 2008년 무작위로 뽑은 알코올 섭취량은 다음과 같다. 15.50, 11.21, 12.67, 8.87, 12.15, 9.88, 2.06, 14.50, 0, 4.97 평균 알코올 섭취량이 달라졌다고 할 수 있는가?</h5>
-<pre class="r"><code>ex3 &lt;- c(15.50, 11.21, 12.67, 8.87, 12.15, 9.88, 2.06, 14.50, 0, 4.97)
+<pre class="r"><code># 가설설정 
 
-shapiro.test(ex3) # 정규성을 가정할 수 있다. </code></pre>
+# H0 : mu1 == 8.1
+# H1 : mu1 != 8.1
+
+ex3 &lt;- c(15.50, 11.21, 12.67, 8.87, 12.15, 9.88, 2.06, 14.50, 0, 4.97)
+
+shapiro.test(ex3) </code></pre>
 <pre><code>## 
 ##  Shapiro-Wilk normality test
 ## 
 ## data:  ex3
 ## W = 0.92341, p-value = 0.3863</code></pre>
-<pre class="r"><code>t.test(ex3, mu=8.1, alternative = &quot;two.sided&quot;)</code></pre>
+<pre class="r"><code># Shapiro-wilk 검정결과 p-value가 0.1058로 정규성을 가정할 수 있다. </code></pre>
+<pre class="r"><code># 모분산을 모르고 소표본인 경우이므로 t-test를 실시하면 다음과 같다. 
+t.test(ex3, mu=8.1, alternative = &quot;two.sided&quot;)</code></pre>
 <pre><code>## 
 ##  One Sample t-test
 ## 
