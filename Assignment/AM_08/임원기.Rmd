@@ -1,5 +1,5 @@
 ---
-title: "이항분포, 정규분포 문제 및 그래프"
+title: "[과제 8]이항분포, 정규분포 문제 및 그래프"
 author: "Lim wonki"
 date: '2019 6 20 '
 output: html_document

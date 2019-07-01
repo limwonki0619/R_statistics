@@ -1,5 +1,5 @@
 ---
-title: '[과제11] 회귀분석'
+title: '[과제12] 회귀분석'
 author: "Lim wonki"
 date: '2019 6 28 '
 output: html_document
