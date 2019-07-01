@@ -460,12 +460,12 @@ n = 1000
 p_hat = 0.43
 p_0 = 430/1000
 
-qnorm(0.9)</code></pre>
-<pre><code>## [1] 1.281552</code></pre>
-<pre class="r"><code>0.43 - (1.28*sqrt( (0.43*(1-0.43))/1000 )) # 신뢰구간 하한 </code></pre>
-<pre><code>## [1] 0.4099607</code></pre>
-<pre class="r"><code>0.43 + (1.28*sqrt( (0.43*(1-0.43))/1000 )) # 신뢰구간 상한 </code></pre>
-<pre><code>## [1] 0.4500393</code></pre>
+qnorm(0.95) # qnorm(1-(alpha/2))</code></pre>
+<pre><code>## [1] 1.644854</code></pre>
+<pre class="r"><code>0.43 - (1.64*sqrt( (0.43*(1-0.43))/1000 )) # 신뢰구간 하한 </code></pre>
+<pre><code>## [1] 0.4043247</code></pre>
+<pre class="r"><code>0.43 + (1.64*sqrt( (0.43*(1-0.43))/1000 )) # 신뢰구간 상한 </code></pre>
+<pre><code>## [1] 0.4556753</code></pre>
 <pre class="r"><code>prop.test(430, 1000, 0.43, alternative = &quot;two.sided&quot;, conf.level = 0.9)</code></pre>
 <pre><code>## 
 ##  1-sample proportions test without continuity correction
